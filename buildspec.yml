@@ -1,0 +1,22 @@
+version: 0.2
+env:
+  variables:
+    AWS_ACCOUNT_ID: "107908347685"
+    ECR_REPOSITORY: "pmh-leasing-ui-dev"
+    REPOSITORY_URI: "pmh-leasing-ui-dev"
+    AWS_DEFAULT_REGION: "ap-southeast-1"
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+      - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
+  build:
+    commands:
+      - docker build --tag "$IMAGE_URI" .
+  post_build:
+    commands:
+      - docker push "$IMAGE_URI"
+      - printf '[{"name":"dotnet-app","imageUri":"%s"}]' "$IMAGE_URI" > images.json
+artifacts:
+  files: images.json
