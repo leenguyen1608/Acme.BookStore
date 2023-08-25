@@ -2,8 +2,8 @@ version: 0.2
 env:
   variables:
     AWS_ACCOUNT_ID: "107908347685"
-    ECR_REPOSITORY: "pmh-leasing-ui-dev"
-    REPOSITORY_URI: "pmh-leasing-ui-dev"
+    ECR_REPOSITORY: "acme-bookstore"
+    REPOSITORY_URI: "acme-bookstore"
     AWS_DEFAULT_REGION: "ap-southeast-1"
 phases:
   pre_build:
@@ -13,7 +13,7 @@ phases:
       - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
   build:
     commands:
-      - docker build --tag "$IMAGE_URI" .
+      - docker build - "$IMAGE_URI" .
   post_build:
     commands:
       - docker push "$IMAGE_URI"
