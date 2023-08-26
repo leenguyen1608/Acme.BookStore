@@ -7,8 +7,8 @@ env:
 phases:
 
   install:
-    runtime-versions:
-      dotnet: latest
+    commands:
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel STS 
       
   pre_build:
     commands:
