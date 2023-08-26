@@ -5,6 +5,11 @@ env:
     ECR_REPOSITORY: "acme-bookstore"
     AWS_DEFAULT_REGION: "ap-southeast-1"
 phases:
+
+  install:
+    runtime-versions:
+      dotnet: latest
+      
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
