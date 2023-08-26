@@ -3,20 +3,23 @@ env:
   variables:
     AWS_ACCOUNT_ID: "107908347685"
     ECR_REPOSITORY: "acme-bookstore"
-    REPOSITORY_URI: "acme-bookstore"
     AWS_DEFAULT_REGION: "ap-southeast-1"
 phases:
   pre_build:
     commands:
+      - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-      - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
   build:
     commands:
-      - docker build -t "$IMAGE_URI" .
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
   post_build:
     commands:
-      - docker push "$IMAGE_URI"
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - printf '[{"name":"dotnet-app","imageUri":"%s"}]' "$IMAGE_URI" > images.json
 artifacts:
   files: images.json
